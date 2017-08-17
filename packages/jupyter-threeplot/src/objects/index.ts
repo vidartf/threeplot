@@ -2,9 +2,9 @@
 // Distributed under the terms of the Modified BSD License.
 
 export {
-  JUPYTER_EXTENSION_VERSION
-} from './version';
+  ObjectModel
+} from './object'
 
-export * from './objects';
-
-export * from './scales';
+export {
+  AxesCrossModel
+} from './axescross'

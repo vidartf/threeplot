@@ -6,9 +6,8 @@
 
 import pytest
 
-from ..example import ExampleWidget
+from ..scales.linear import LinearScaleWidget
 
 
-def test_example_creation_blank():
-    w = ExampleWidget()
-    assert w.value == 'Hello World'
+def test_linearscale_creation_blank():
+    w = LinearScaleWidget()

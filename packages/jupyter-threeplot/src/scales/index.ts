@@ -2,9 +2,9 @@
 // Distributed under the terms of the Modified BSD License.
 
 export {
-  JUPYTER_EXTENSION_VERSION
-} from './version';
+  ScaleModel
+} from './scale'
 
-export * from './objects';
-
-export * from './scales';
+export {
+  LinearScaleModel
+} from './linear'

@@ -23,33 +23,33 @@ const EXTENSION_ID = 'jupter.extensions.threeplot'
  * The token identifying the JupyterLab plugin.
  */
 export
-const IExampleExtension = new Token<IExampleExtension>(EXTENSION_ID);
+const IThreePlotExtension = new Token<IThreePlotExtension>(EXTENSION_ID);
 
 /**
  * The type of the provided value of the plugin in JupyterLab.
  */
 export
-interface IExampleExtension {
+interface IThreePlotExtension {
 };
 
 
 /**
  * The notebook diff provider.
  */
-const exampleProvider: JupyterLabPlugin<IExampleExtension> = {
+const threePlotProvider: JupyterLabPlugin<IThreePlotExtension> = {
   id: EXTENSION_ID,
   requires: [INBWidgetExtension],
   activate: activateWidgetExtension,
   autoStart: true
 };
 
-export default exampleProvider;
+export default threePlotProvider;
 
 
 /**
  * Activate the widget extension.
  */
-function activateWidgetExtension(app: JupyterLab, widgetsManager: INBWidgetExtension): IExampleExtension {
+function activateWidgetExtension(app: JupyterLab, widgetsManager: INBWidgetExtension): IThreePlotExtension {
   widgetsManager.registerWidget({
       name: 'jupyter-threeplot',
       version: yourCode.JUPYTER_EXTENSION_VERSION,

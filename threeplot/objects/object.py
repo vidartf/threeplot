@@ -8,21 +8,15 @@
 TODO: Add module docstring
 """
 
-from ipywidgets import DOMWidget
+from pythreejs import Blackbox
 from traitlets import Unicode
 
-module_name = "jupyter-threeplot"
-module_version = "1.0.0"
+from .._frontend import module_name, module_version
 
 
-class ExampleWidget(DOMWidget):
+class ObjectWidget(Blackbox):
     """TODO: Add docstring here
     """
-    _model_name = 'ExampleModel'
+    _model_name = Unicode('ObjectModel').tag(sync=True)
     _model_module = Unicode(module_name).tag(sync=True)
     _model_module_version = Unicode(module_version).tag(sync=True)
-    _model_name = 'ExampleView'
-    _view_module = Unicode(module_name).tag(sync=True)
-    _view_module_version = Unicode(module_version).tag(sync=True)
-
-    value = Unicode('Hello World')
