@@ -23,7 +23,8 @@
     "widgets"
   ],
   "dependencies": {
-    "@jupyter-widgets/base": "~0.6.11"
+    "@jupyter-widgets/base": "~0.6.11",
+    "jupyter-threejs": "^0.4.0-alpha.0"
   },
   "devDependencies": {
     "@types/expect.js": "^0.3.29",
