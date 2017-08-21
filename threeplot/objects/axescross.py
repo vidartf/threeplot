@@ -10,10 +10,10 @@ TODO: Add module docstring
 
 from traitlets import Unicode
 
-from .base import ObjectWidget
+from .object import ObjectWidget
 
 
 class AxesCrossWidget(ObjectWidget):
     """TODO: Add docstring here
     """
-    _model_name = Unicode('AxesCrossModel')
+    _model_name = Unicode('AxesCrossModel').tag(sync=True)

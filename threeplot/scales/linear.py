@@ -11,7 +11,7 @@ Defiens linear scale widget, and any supporting functions
 from traitlets import CFloat, Unicode, List, Union, Bool
 from ipywidgets import Color
 
-from .base import ScaleWidget
+from .scale import ScaleWidget
 
 
 class LinearScaleWidget(ScaleWidget):
@@ -20,7 +20,7 @@ class LinearScaleWidget(ScaleWidget):
     See the documentation for d3-scale's linear for
     further details.
     """
-    _model_name = Unicode('LinearScaleModel')
+    _model_name = Unicode('LinearScaleModel').tag(sync=True)
 
     domain = List(trait=CFloat(), default_value=[0., 1.], minlen=2).tag(sync=True)
     range = List(trait=Union([CFloat(), Color()]), default_value=[0., 1.], minlen=2).tag(sync=True)
