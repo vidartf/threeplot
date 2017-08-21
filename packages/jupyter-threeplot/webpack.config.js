@@ -12,10 +12,10 @@ module.exports = {
     libraryTarget: 'amd'
   },
   module: {
-    loaders: loaders
+    rules: loaders
   },
   devtool: 'source-map',
-  externals: ['@jupyter-widgets/base'],
+  externals: ['@jupyter-widgets/base', 'jupyter-datawidgets', 'jupyter-threejs', 'three'],
   resolve: {
     // Add '.ts' and '.tsx' as resolvable extensions.
     extensions: [".webpack.js", ".web.js", ".ts", ".js"]

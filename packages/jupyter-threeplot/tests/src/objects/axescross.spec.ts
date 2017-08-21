@@ -12,21 +12,21 @@ import {
 } from '../utils.spec';
 
 import {
-  ObjectModel
+  AxesCrossModel
 } from '../../../src/'
 
 
-describe('ObjectModel', () => {
+describe('AxesCrossModel', () => {
 
     it('should be createable', () => {
-        let model = createTestModel(ObjectModel);
-        expect(model).to.be.an(ObjectModel);
+        let model = createTestModel(AxesCrossModel);
+        expect(model).to.be.an(AxesCrossModel);
     });
 
-    it('should be createable with a value', () => {
-        let state = { value: 'Foo Bar!' }
-        let model = createTestModel(ObjectModel, state);
-        expect(model).to.be.an(ObjectModel);
+    it('should be createable with a state', () => {
+        let state = { position: [1, 2, 3] }
+        let model = createTestModel(AxesCrossModel, state);
+        expect(model).to.be.an(AxesCrossModel);
     });
 
 });

@@ -3,20 +3,29 @@
 
 
 import {
+  WidgetModel, ManagerBase
+} from '@jupyter-widgets/base';
+
+import {
   JUPYTER_EXTENSION_VERSION
-} from './version';
+} from '../version';
 
 import {
   BaseModel
 } from '../base';
 
 
+import {
+  BlackboxModel
+} from 'jupyter-threejs';
+
+//import pythreejs = require('jupyter-threejs');
 
 /**
  * TODO: Docstring
  */
 export
-class ObjectModel extends BaseModel {
+abstract class ObjectModel extends BlackboxModel {
   defaults() {
     return {...super.defaults(),
       _model_name: ObjectModel.model_name,

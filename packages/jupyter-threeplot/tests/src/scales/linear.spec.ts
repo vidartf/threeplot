@@ -8,6 +8,10 @@ import {
 } from '@jupyter-widgets/base';
 
 import {
+  scaleLinear, InterpolatorFactory
+} from 'd3-scale';
+
+import {
   createTestModel
 } from '../utils.spec';
 
@@ -21,6 +25,9 @@ describe('LinearScaleModel', () => {
     it('should be createable', () => {
         let model = createTestModel(LinearScaleModel);
         expect(model).to.be.an(LinearScaleModel);
+        return model.initPromise.then(() => {
+          expect(typeof model.obj).to.be('function');
+        });
     });
 
     it('should be createable with a value', () => {

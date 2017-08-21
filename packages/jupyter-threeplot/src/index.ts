@@ -8,3 +8,5 @@ export {
 export * from './objects';
 
 export * from './scales';
+
+export * from './base';

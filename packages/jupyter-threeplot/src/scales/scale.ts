@@ -3,8 +3,12 @@
 
 
 import {
+  WidgetModel, ManagerBase
+} from '@jupyter-widgets/base';
+
+import {
   JUPYTER_EXTENSION_VERSION
-} from './version';
+} from '../version';
 
 import {
   BaseModel
@@ -16,7 +20,7 @@ import {
  * TODO: Docstring
  */
 export
-class ScaleModel extends BaseModel {
+abstract class ScaleModel extends BaseModel {
   defaults() {
     return {...super.defaults(),
       _model_name: ScaleModel.model_name,

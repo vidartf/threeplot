@@ -13,6 +13,7 @@
     "sourceMap": true
   },
   "include": [
-    "**/*.ts"
+    "**/*.ts",
+    "../../src/typings.d.ts"
   ]
 }

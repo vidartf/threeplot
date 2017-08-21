@@ -93,6 +93,7 @@ setup_args = dict(
 setuptools_args = {}
 install_requires = setuptools_args['install_requires'] = [
     'ipywidgets>=7.0.0b12',
+    'pythreejs',
 ]
 
 extras_require = setuptools_args['extras_require'] = {
