@@ -8,4 +8,3 @@ from ._version import *
 from .nbextension import _jupyter_nbextension_paths
 
 from .objects import *
-from .scales import *

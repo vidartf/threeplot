@@ -24,14 +24,11 @@
   ],
   "dependencies": {
     "@jupyter-widgets/base": "~0.6.11",
-    "d3-interpolate": "^1.1.5",
-    "d3-scale": "^1.0.6",
     "jupyter-threejs": "^0.4.0-alpha.0",
-    "three": "^0.85.1"
+    "three": "^0.85.1",
+    "jupyter-scales": "^1.0.0"
   },
   "devDependencies": {
-    "@types/d3-interpolate": "^1.1.6",
-    "@types/d3-scale": "^1.0.10",
     "@types/expect.js": "^0.3.29",
     "@types/mocha": "^2.2.41",
     "@types/node": "^8.0.17",

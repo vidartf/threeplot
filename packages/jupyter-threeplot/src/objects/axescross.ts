@@ -12,7 +12,7 @@ import {
 
 import {
   ISerializerMap
-} from '../base';
+} from 'jupyter-scales';
 
 import {
   ObjectModel

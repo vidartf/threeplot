@@ -10,10 +10,6 @@ import {
   JUPYTER_EXTENSION_VERSION
 } from '../version';
 
-import {
-  BaseModel
-} from '../base';
-
 
 import {
   BlackboxModel
@@ -33,7 +29,7 @@ abstract class ObjectModel extends BlackboxModel {
   }
 
   static serializers = {
-      ...BaseModel.serializers,
+      ...BlackboxModel.serializers,
       // Add any extra serializers here
     }
 
