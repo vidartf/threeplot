@@ -8,3 +8,7 @@ export {
 export {
   AxesCrossModel
 } from './axescross'
+
+export {
+  GridCrossModel
+} from './gridcross'
