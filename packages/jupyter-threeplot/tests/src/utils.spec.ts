@@ -92,13 +92,18 @@ interface Constructor<T> {
 }
 
 export
-function createTestModel<T extends widgets.WidgetModel>(constructor: Constructor<T>, attributes?: any): T {
+function createTestModel<T extends widgets.WidgetModel>(
+    constructor: Constructor<T>, attributes?: any, widget_manager?: widgets.ManagerBase<any>): T {
   let id = widgets.uuid();
-  let widget_manager = new DummyManager();
+  if (!widget_manager) {
+    widget_manager = new DummyManager();
+  }
   let modelOptions = {
       widget_manager: widget_manager,
       model_id: id,
   }
 
-  return new constructor(attributes, modelOptions);
+  let model = new constructor(attributes, modelOptions);
+  (widget_manager as any)._models[id] = Promise.resolve(model);
+  return model;
 }

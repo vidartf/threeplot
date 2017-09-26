@@ -16,17 +16,18 @@
     "test:debug": "karma start --browsers=Chrome --singleRun=false --debug=true tests/karma.conf.js",
     "test:firefox": "karma start --browsers=Firefox tests/karma.conf.js",
     "test:ie": "karma start --browsers=IE tests/karma.conf.js",
-    "prepublish": "npm run clean && npm run build"
+    "prepublish": "npm run clean && npm run build",
+    "watch": "webpack --watch"
   },
   "keywords": [
     "jupyter",
     "widgets"
   ],
   "dependencies": {
-    "@jupyter-widgets/base": "~0.6.11",
+    "@jupyter-widgets/base": "^1.0.1",
+    "jupyter-scales": "^1.0.1-0",
     "jupyter-threejs": "^0.4.0-alpha.0",
-    "three": "^0.85.1",
-    "jupyter-scales": "^1.0.0"
+    "three": "^0.85.1"
   },
   "devDependencies": {
     "@types/expect.js": "^0.3.29",

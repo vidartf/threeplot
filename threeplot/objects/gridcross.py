@@ -8,9 +8,10 @@
 TODO: Add module docstring
 """
 
-from traitlets import Unicode, Instance, Tuple, Dict, CInt, CFloat
+from traitlets import Unicode, Instance, Tuple, Dict, CInt, CFloat, Bool, Union
 from ipywidgets import widget_serialization
 from ipywidgets.widgets.trait_types import Color
+from pythreejs import Scene, Object3D
 
 from .object import ObjectWidget
 from ipyscales import LinearScaleWidget
@@ -74,6 +75,11 @@ class GridCrossWidget(ObjectWidget):
 
     grid_styles = DefaultTuple(GridStyleTrait(), GridStyleTrait(), GridStyleTrait(),
                         help='grid styles in the order: XY, XZ, YZ').tag(sync=True)
+
+    autosize_target = Union([Instance(Scene), Instance(Object3D)], allow_none=True).tag(sync=True, **widget_serialization)
+    autosize_axes = Union([Bool(), Tuple(Bool(), Bool(), Bool())], default_value=True).tag(sync=True)
+
+    tight = Bool(False).tag(sync=True)
 
     line_color = Color('black').tag(sync=True)
     line_width = CFloat(1.0).tag(sync=True)

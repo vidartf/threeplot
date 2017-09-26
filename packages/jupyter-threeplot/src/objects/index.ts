@@ -11,4 +11,4 @@ export {
 
 export {
   GridCrossModel
-} from './gridcross'
+} from './grids'

@@ -6,6 +6,7 @@
 declare module 'jupyter-threejs' {
 
   import { WidgetModel } from '@jupyter-widgets/base';
+  import * as THREE from 'three';
 
   export
   interface ICacheDescriptor {
@@ -24,19 +25,32 @@ declare module 'jupyter-threejs' {
     putThreeObjectIntoCache(cacheDescriptor: ICacheDescriptor, object: any): void;
     onCustomMessage(content: any, buffers: any): void;
     onExecThreeObjMethod(methodName: string, args: any[], buffer: any);
-    onChange(model, options);
-    onChildChanged(model, options);
+    onChange(model: ThreeModel, options: any);
+    onChildChanged(model: ThreeModel, options: any);
     syncToThreeObj(): void;
     syncToModel(): void;
+
+    obj: any;
+    three_properties: string[];
+    three_nested_properties: string[];
+    datawidget_properties: string[];
+    initPromise: Promise<any>;
   }
 
   export
-  class Object3D extends ThreeModel {
+  class Object3DModel extends ThreeModel {
+    obj: THREE.Object3D;
   }
 
   export
-  class BlackboxModel extends Object3D {
+  class BlackboxModel extends Object3DModel {
     abstract constructThreeObject():any | Promise<any>;
   }
+
+  export
+  function computeBoundingBox(scene: THREE.Scene | THREE.Object3D): THREE.Box3;
+
+  export
+  function computeBoundingSphere(scene: THREE.Scene | THREE.Object3D): THREE.Sphere;
 
 }
