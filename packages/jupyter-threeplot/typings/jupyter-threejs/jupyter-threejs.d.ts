@@ -43,6 +43,16 @@ declare module 'jupyter-threejs' {
   }
 
   export
+  class CameraModel extends Object3DModel {
+    obj: THREE.Camera;
+  }
+
+  export
+  class SceneModel extends Object3DModel {
+    obj: THREE.Scene;
+  }
+
+  export
   class BlackboxModel extends Object3DModel {
     abstract constructThreeObject():any | Promise<any>;
   }
@@ -52,5 +62,12 @@ declare module 'jupyter-threejs' {
 
   export
   function computeBoundingSphere(scene: THREE.Scene | THREE.Object3D): THREE.Sphere;
+
+
+  export
+  function getObjectScene(object3d: THREE.Object3D): THREE.Scene | null;
+
+  export
+  function getModelScene(model: Object3DModel): SceneModel | null;
 
 }

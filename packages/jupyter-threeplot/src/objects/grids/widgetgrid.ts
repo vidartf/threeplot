@@ -17,7 +17,7 @@ import {
 } from 'jupyter-scales';
 
 import {
-  ThreeModel, computeBoundingBox
+  ThreeModel, computeBoundingBox, getModelScene, CameraModel
 } from 'jupyter-threejs';
 
 import {
@@ -33,7 +33,7 @@ import {
 } from './common';
 
 import {
-  gridTriplet
+  createGridTriplet, applyModes, Mode
 } from './threegrid';
 
 
@@ -81,6 +81,8 @@ class GridCrossModel<TDomain> extends ObjectModel {
       tight: false,
       line_color: 'black',
       line_width: 1.0,
+      mode: 'min',
+      camera: null,
     };
   }
 
@@ -89,6 +91,7 @@ class GridCrossModel<TDomain> extends ObjectModel {
 
     this.three_nested_properties.push('scales');
     this.three_properties.push('autosize_target');
+    this.three_properties.push('camera');
   }
 
   setupListeners(): void {
@@ -133,10 +136,21 @@ class GridCrossModel<TDomain> extends ObjectModel {
   }
 
   onChildChanged(model: ThreeModel, options: any): void {
-    this.obj.remove.apply(this.obj, this.obj.children);
-    this.obj.add(this.createGridTripletFromModel());
+    if (model === this.get('camera')) {
+      this.onCameraChange(model, options);
+    } else {
+      this.obj.remove.apply(this.obj, this.obj.children);
+      this.obj.add(this.createGridTripletFromModel());
+    }
 
     super.onChildChanged(model, options);
+  }
+
+  onCameraChange(model?: ThreeModel, options?: any): void {
+    let mode = this.get('mode') as Mode;
+    let modes = [mode, mode, mode];
+    let cameraModel = this.get('camera') as CameraModel;
+    applyModes(this.obj.children[0], modes, cameraModel ? cameraModel.obj : null, this.gridScales);
   }
 
   onChange(model: ThreeModel, options: any): void {
@@ -215,7 +229,14 @@ class GridCrossModel<TDomain> extends ObjectModel {
     this.createGridScales(scales);
 
     let gridStyles = this.get('grid_styles');
-    return gridTriplet(this.gridScales, gridStyles, material);
+    const triplet = createGridTriplet(this.gridScales, gridStyles, material);
+
+    let mode = this.get('mode') as Mode;
+    let modes = [mode, mode, mode];
+    let cameraModel = this.get('camera') as CameraModel;
+    applyModes(triplet, modes, cameraModel ? cameraModel.obj : null, this.gridScales);
+
+    return triplet;
   }
 
   gridScales: ScaleContinuousNumeric<number, TDomain | number>[];
@@ -225,6 +246,7 @@ class GridCrossModel<TDomain> extends ObjectModel {
       ...GridCrossModel.serializers,
       scales: { deserialize: unpack_models },
       autosize_target: { deserialize: unpack_models },
+      camera: { deserialize: unpack_models },
     }
 
   static model_name = 'GridCrossModel';

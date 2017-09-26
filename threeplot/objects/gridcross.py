@@ -8,10 +8,10 @@
 TODO: Add module docstring
 """
 
-from traitlets import Unicode, Instance, Tuple, Dict, CInt, CFloat, Bool, Union
+from traitlets import Unicode, Instance, Tuple, Dict, CInt, CFloat, Bool, Union, Enum
 from ipywidgets import widget_serialization
 from ipywidgets.widgets.trait_types import Color
-from pythreejs import Scene, Object3D
+from pythreejs import Scene, Object3D, Camera
 
 from .object import ObjectWidget
 from ipyscales import LinearScaleWidget
@@ -78,6 +78,11 @@ class GridCrossWidget(ObjectWidget):
 
     autosize_target = Union([Instance(Scene), Instance(Object3D)], allow_none=True).tag(sync=True, **widget_serialization)
     autosize_axes = Union([Bool(), Tuple(Bool(), Bool(), Bool())], default_value=True).tag(sync=True)
+
+    mode = Enum(['min', 'max', 'minmax', 'zero'], 'min').tag(sync=True)
+
+    camera = Instance(Camera, allow_none=True,
+        help='Needed for minmax grid mode').tag(sync=True, **widget_serialization)
 
     tight = Bool(False).tag(sync=True)
 

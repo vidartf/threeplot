@@ -11,6 +11,14 @@ import {
 } from './common';
 
 
+const ZERO = new THREE.Vector3();
+const UNIT_VECTORS = [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1)];
+
+const LABEL_RELATIVE_OFFSET = 0.07;
+
+export
+type Mode = 'min' | 'max' | 'minmax' | 'zero';
+
 /**
  * Get a value that is small compared to the domain of a scale.
  *
@@ -113,10 +121,10 @@ function gridLineMaterialFromStyle(style: IGridStyle,
  */
 export
 function gridStraightLineGeometry<TDomain>(scale: ScaleContinuousNumeric<number, TDomain>,
-                                       offset: THREE.Vector3,
-                                       scaleVector: THREE.Vector3,
-                                       lineVector: THREE.Vector3):
-                                       minorMajorDoublet<THREE.BufferGeometry> {
+                                           offset: THREE.Vector3,
+                                           scaleVector: THREE.Vector3,
+                                           lineVector: THREE.Vector3):
+                                           minorMajorDoublet<THREE.BufferGeometry> {
 
   const ticks = {
     minor: scale.ticks(N_MINOR_TICKS),
@@ -154,8 +162,6 @@ function gridStraightLineGeometry<TDomain>(scale: ScaleContinuousNumeric<number,
   return { minor: geometries[0], major: geometries[1] };
 }
 
-const ZERO = new THREE.Vector3();
-
 export
 function gridRectLineGeometry<TDomain>(scales: ScaleContinuousNumeric<number, TDomain>[],
                                        axes: number[],
@@ -185,15 +191,16 @@ function gridRectLineGeometry<TDomain>(scales: ScaleContinuousNumeric<number, TD
   return geometries;
 }
 
-function labelRectAxesOffsets(bounds: IBounds, axes: number[]): THREE.Vector3 {
-  let minSize = Math.min(...bounds.size.toArray());
-  const i = axes.indexOf(0) === -1 ? 0 : axes.indexOf(1) === -1 ? 1 : 2;
+function labelRectAxesOffsets(offset: THREE.Vector3, size: THREE.Vector3, axes: number[]): THREE.Vector3 {
+  let minSize = Math.min(...size.toArray());
+  //const i = axes.indexOf(0) === -1 ? 0 : axes.indexOf(1) === -1 ? 1 : 2;
+  const i = axes[0];
   const ret = new THREE.Vector3(
-    i !== 0 ? bounds.offset.x : 0,
-    i !== 1 ? bounds.offset.y : 0,
-    i !== 2 ? bounds.offset.z : 0);
+    i !== 0 ? offset.x : 0,
+    i !== 1 ? offset.y : 0,
+    i !== 2 ? offset.z : 0);
   const j = axes[1];
-  ret.setComponent(j, ret.getComponent(j) + bounds.size.getComponent(j) + 0.07 * minSize);
+  ret.setComponent(j, ret.getComponent(j) + size.getComponent(j) + LABEL_RELATIVE_OFFSET * minSize);
   return ret;
 }
 
@@ -257,46 +264,97 @@ function gridFromGeometries<TDomain>(geometries: minorMajorDoublet<THREE.BufferG
   return result;
 }
 
+function getMinMax<TDomain>(planeIndex: number, camera: THREE.Camera): 'min' | 'max' {
+  let cameraDirection = new THREE.Vector3();
+  let planeNormal = UNIT_VECTORS[2-planeIndex];
+  camera.getWorldDirection(cameraDirection);
+  const dot = planeNormal.dot(cameraDirection);
+  if (dot > 0) {
+    return 'max';
+  } else {
+    return 'min';
+  }
+}
+
+export
+function applyModes<TDomain>(triplet: THREE.Group, modes: Mode[], camera: THREE.Camera | null, scales: ScaleContinuousNumeric<number, TDomain>[]) {
+  const bounds = getGridTripletBounds(scales);
+  const tripletIndices = [[0, 1], [2, 0], [1, 2]];  // XY, ZX, YZ
+  let minSize = Math.min(...bounds.size.toArray());
+  for (let i=0; i<3; ++i) {
+    let mode = modes[i];
+    if (mode === 'minmax') {
+      if (camera === null) {
+        throw new Error('Camera need to be given for minmax mode!');
+      }
+      mode = getMinMax(i, camera);
+    }
+    const iNormal = 2 - i;
+    let value: number;
+    if (mode === 'zero') {
+      value = 0;
+    } else if (mode === 'min') {
+      value = bounds.offset.getComponent(iNormal);
+    } else if (mode === 'max') {
+      value = bounds.offset.getComponent(iNormal) + bounds.size.getComponent(iNormal);
+    } else {
+      throw new Error(`Invalid mode: ${mode}`);
+    }
+    // Set grid position:
+    triplet.children[i].position.setComponent(iNormal, value);
+    // Set label group position:
+    triplet.children[i+3].position.setComponent(iNormal, value);
+  }
+}
+
 /**
  * Create three grids (XY/XZ/YZ) from three scale/style pairs.
  */
 export
-function gridTriplet<TDomain>(scales: ScaleContinuousNumeric<number, TDomain>[],
+function createGridTriplet<TDomain>(scales: ScaleContinuousNumeric<number, TDomain>[],
                               styles: IGridStyle[],
                               parentMaterial: THREE.LineBasicMaterial):
-                              THREE.Object3D {
+                              THREE.Group {
   // TODO: Take optional material cache?
   const tripletIndices = [[0, 1], [2, 0], [1, 2]];  // XY, ZX, YZ
-  const unitVectors = [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1)];
+  const gridOffset = new THREE.Vector3();
   const bounds = getGridTripletBounds(scales);
   const grids = [];
   let geometries: minorMajorDoublet<THREE.BufferGeometry>[];
-  // TODO: Introduce grid modes: intersect at low/high end (with switching) or zero
   for (let axes of tripletIndices) {
-    geometries = gridRectLineGeometry(scales, axes, bounds.offset, bounds.size);
+    const iNormal = axes.indexOf(0) === -1 ? 0 : axes.indexOf(1) === -1 ? 1 : 2;
+    gridOffset.copy(bounds.offset).setComponent(iNormal, 0);
+
+    geometries = gridRectLineGeometry(scales, axes, gridOffset, bounds.size);
     let grid = gridFromGeometries(geometries, styles[tripletIndices.indexOf(axes)], parentMaterial);
-    //grid.position.copy();
     grids.push(grid);
   }
 
-  const tick_labels = [];
+  const tick_label_groups = [];
   let minSize = Math.min(...bounds.size.toArray());
   for (let axes of tripletIndices) {
+    const iNormal = axes.indexOf(0) === -1 ? 0 : axes.indexOf(1) === -1 ? 1 : 2;
+    gridOffset.copy(bounds.offset).setComponent(iNormal, 0);
     // Add major tick labels:
     let scale = scales[axes[0]];
     let tickFormat = scale.tickFormat(N_MAJOR_TICKS);
     const vector = new THREE.Vector3();
+    const tick_labels = [];
     for (let tick of scale.ticks(N_MAJOR_TICKS)) {
       let sprite = createLabel(tickFormat(tick), styles[axes[0]]);
-      let offset = labelRectAxesOffsets(bounds, axes);
-      sprite.position.copy(offset).addScaledVector(unitVectors[axes[0]], tick);
+      sprite.position.addScaledVector(UNIT_VECTORS[axes[0]], tick);
       sprite.scale.multiplyScalar(minSize);
       tick_labels.push(sprite);
     }
+    let offset = labelRectAxesOffsets(gridOffset, bounds.size, axes);
+    const labelGroup = new THREE.Group()
+    labelGroup.position.copy(offset);
+    labelGroup.add(...tick_labels);
+    tick_label_groups.push(labelGroup);
   }
 
   let result = new THREE.Group();
-  result.add(...grids, ...tick_labels);
+  result.add(...grids, ...tick_label_groups);
   return result;
 }
 
