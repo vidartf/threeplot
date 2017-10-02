@@ -30,6 +30,7 @@
     "three": "^0.85.1"
   },
   "devDependencies": {
+    "@types/d3-scale": "^1.0.10",
     "@types/expect.js": "^0.3.29",
     "@types/mocha": "^2.2.41",
     "@types/node": "^8.0.17",

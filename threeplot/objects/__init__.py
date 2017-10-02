@@ -6,4 +6,5 @@
 
 from .object import ObjectWidget
 from .axescross import AxesCrossWidget
-from .gridcross import GridCrossWidget, GridlineStyle, GridStyle
+from .gridcross import GridCross, GridlineStyle, GridStyle
+from .cylindricalgrid import CylindricalGrid

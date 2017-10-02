@@ -10,11 +10,18 @@ import {
   IGridStyle, IGridlineStyle, N_MAJOR_TICKS, N_MINOR_TICKS
 } from './common';
 
+import {
+  Cylindrical
+} from '../../cylinder';
+
 
 const ZERO = new THREE.Vector3();
 const UNIT_VECTORS = [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1)];
 
 const LABEL_RELATIVE_OFFSET = 0.07;
+const CIRCLE_STEPS_PER_DEGREE = 1;
+
+
 
 export
 type Mode = 'min' | 'max' | 'minmax' | 'zero';
@@ -120,7 +127,7 @@ function gridLineMaterialFromStyle(style: IGridStyle,
  * @returns {minorMajorDoublet<THREE.BufferGeometry>}
  */
 export
-function gridStraightLineGeometry<TDomain>(scale: ScaleContinuousNumeric<number, TDomain>,
+function createParallelLinesGeometry<TDomain>(scale: ScaleContinuousNumeric<number, TDomain>,
                                            offset: THREE.Vector3,
                                            scaleVector: THREE.Vector3,
                                            lineVector: THREE.Vector3):
@@ -163,7 +170,7 @@ function gridStraightLineGeometry<TDomain>(scale: ScaleContinuousNumeric<number,
 }
 
 export
-function gridRectLineGeometry<TDomain>(scales: ScaleContinuousNumeric<number, TDomain>[],
+function createRectLineGeometries<TDomain>(scales: ScaleContinuousNumeric<number, TDomain>[],
                                        axes: number[],
                                        offset: THREE.Vector3,
                                        size: THREE.Vector3):
@@ -181,7 +188,7 @@ function gridRectLineGeometry<TDomain>(scales: ScaleContinuousNumeric<number, TD
       axes[1-i] == 1 ? size.y : 0,
       axes[1-i] == 2 ? size.z : 0);
     geometries.push(
-      gridStraightLineGeometry(
+      createParallelLinesGeometry(
         scales[axes[i]],
         offset,
         scaleVector,
@@ -202,6 +209,118 @@ function labelRectAxesOffsets(offset: THREE.Vector3, size: THREE.Vector3, axes: 
   const j = axes[1];
   ret.setComponent(j, ret.getComponent(j) + size.getComponent(j) + LABEL_RELATIVE_OFFSET * minSize);
   return ret;
+}
+
+
+/**
+ * Create geometries for a polar grid (base plane)
+ *
+ * @param scales
+ * @param axes
+ * @param offset
+ * @param size
+ */
+export
+function createPolarGridGeometries<TDomain>(
+    radialScale: ScaleContinuousNumeric<number, TDomain>,
+    azimuthalScale: ScaleContinuousNumeric<number, TDomain>,
+
+    offset: Cylindrical,
+    size: Cylindrical):
+    minorMajorDoublet<THREE.BufferGeometry>[] {
+  // Steps:
+  // 1. Create radial, straight lines in base plane
+  // 2. Create concetric circles in base plane
+  const geometries: minorMajorDoublet<THREE.BufferGeometry>[] = [];
+
+  // 1.
+  const thetaTicks = {
+    minor: azimuthalScale.ticks(N_MINOR_TICKS),
+    major: azimuthalScale.ticks(N_MAJOR_TICKS),
+  }
+  const thetaEps = getScaleDomainEpsilon(azimuthalScale);
+  const vertexA = new THREE.Vector3();
+  const vertexB = new THREE.Vector3();
+  let cylA = offset.clone();
+  let cylB = offset.clone();
+  cylB.radius += size.radius;
+  const thetaDoublet: minorMajorDoublet<THREE.BufferGeometry> = {
+    minor: new THREE.BufferGeometry(),
+    major: new THREE.BufferGeometry()
+  };
+  for (const which of ['minor', 'major'] as ('minor' | 'major')[]) {
+    const vertices: number[] = [];
+
+    for (const tick of thetaTicks[which]) {
+      // Skip minor ticks which are also major ticks
+      if (which === 'minor' && containsApproximate(thetaTicks['major'], tick, thetaEps)) {
+        continue;
+      }
+
+      cylA.theta = cylB.theta = tick;
+
+      (vertexA as any).setFromCylindrical(cylA);
+      (vertexB as any).setFromCylindrical(cylB);
+
+      // Push a vertex pair (one line):
+      vertices.push(
+        vertexA.x, vertexA.y, vertexA.z,
+        vertexB.x, vertexB.y, vertexB.z
+      );
+    }
+
+    thetaDoublet[which].addAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+  }
+  geometries.push(thetaDoublet);
+
+  // 2.
+  const radialTicks = {
+    minor: radialScale.ticks(N_MINOR_TICKS),
+    major: radialScale.ticks(N_MAJOR_TICKS),
+  }
+  const radialEps = getScaleDomainEpsilon(radialScale);
+  const N_STEPS = Math.floor(CIRCLE_STEPS_PER_DEGREE*(180 * size.theta / Math.PI));
+  let swapCyl: Cylindrical;
+  const radialDoublet: minorMajorDoublet<THREE.BufferGeometry> = {
+    minor: new THREE.BufferGeometry(),
+    major: new THREE.BufferGeometry()
+  };
+  for (const which of ['minor', 'major'] as ('minor' | 'major')[]) {
+    const vertices: number[] = [];
+    const geometry = new THREE.BufferGeometry();
+
+    for (const tick of radialTicks[which]) {
+      // Skip minor ticks which are also major ticks
+      if (which === 'minor' && containsApproximate(radialTicks['major'], tick, radialEps)) {
+        continue;
+      }
+
+      cylA.copy(offset);
+      cylB.copy(offset);
+      cylA.radius = cylB.radius = tick;
+
+      for (let step=1; step<N_STEPS; ++step) {
+        cylB.theta = offset.theta + size.theta * step / (N_STEPS - 1);
+
+        (vertexA as any).setFromCylindrical(cylA);
+        (vertexB as any).setFromCylindrical(cylB);
+
+        // Push a vertex pair (one segment of circle):
+        vertices.push(
+          vertexA.x, vertexA.y, vertexA.z,
+          vertexB.x, vertexB.y, vertexB.z
+        );
+        swapCyl = cylA;
+        cylA = cylB;
+        cylB = swapCyl;
+      }
+    }
+
+    radialDoublet[which].addAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+  }
+  geometries.push(radialDoublet);
+
+  return geometries;
 }
 
 export
@@ -325,7 +444,7 @@ function createGridTriplet<TDomain>(scales: ScaleContinuousNumeric<number, TDoma
     const iNormal = axes.indexOf(0) === -1 ? 0 : axes.indexOf(1) === -1 ? 1 : 2;
     gridOffset.copy(bounds.offset).setComponent(iNormal, 0);
 
-    geometries = gridRectLineGeometry(scales, axes, gridOffset, bounds.size);
+    geometries = createRectLineGeometries(scales, axes, gridOffset, bounds.size);
     let grid = gridFromGeometries(geometries, styles[tripletIndices.indexOf(axes)], parentMaterial);
     grids.push(grid);
   }
@@ -355,6 +474,39 @@ function createGridTriplet<TDomain>(scales: ScaleContinuousNumeric<number, TDoma
 
   let result = new THREE.Group();
   result.add(...grids, ...tick_label_groups);
+  return result;
+}
+
+export
+function createCylindricalGrids<TDomain>(scales: ScaleContinuousNumeric<number, TDomain>[],
+                                         styles: IGridStyle[],
+                                         parentMaterial: THREE.LineBasicMaterial):
+                                         THREE.Group {
+  let result = new THREE.Group();
+
+  let offset = new (THREE as any).Cylindrical(
+    Math.min(...scales[0].domain()),
+    Math.min(...scales[1].domain()),
+    Math.min(...scales[2].domain())
+  ) as Cylindrical;
+  let size = new (THREE as any).Cylindrical(
+    Math.max(...scales[0].domain()) - offset.radius,
+    Math.max(...scales[1].domain()) - offset.theta,
+    Math.max(...scales[2].domain()) - offset.y
+  ) as Cylindrical;
+
+  let geometries = createPolarGridGeometries(scales[0], scales[1], offset, size);
+  let baseGrid = gridFromGeometries(geometries, styles[0], parentMaterial);
+  result.add(baseGrid);
+  return result;
+}
+
+export
+function createTriRectGrids<TDomain>(scales: ScaleContinuousNumeric<number, TDomain>[],
+                                     styles: IGridStyle[],
+                                     parentMaterial: THREE.LineBasicMaterial):
+                                     THREE.Group {
+  let result = new THREE.Group();
   return result;
 }
 

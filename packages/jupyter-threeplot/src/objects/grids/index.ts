@@ -1,4 +1,8 @@
 
 export {
-  GridCrossModel
+  GridCrossModel, CylindricalGridModel
 } from './widgetgrid';
+
+export {
+  IGridStyle, IGridlineStyle
+} from './common';

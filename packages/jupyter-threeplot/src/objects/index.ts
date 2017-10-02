@@ -10,5 +10,5 @@ export {
 } from './axescross'
 
 export {
-  GridCrossModel
+  GridCrossModel, CylindricalGridModel
 } from './grids'

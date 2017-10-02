@@ -22,8 +22,12 @@ import {
 } from '../utils.spec';
 
 import {
-  GridCrossModel, defaultGridStyle, IGridStyle
-} from '../../../src/objects/gridcross'
+   IGridStyle, GridCrossModel
+} from '../../../src/objects/grids';
+
+import {
+  defaultGridStyle
+} from '../../../src/objects/grids/widgetgrid';
 
 
 function emptyGridStyle(): IGridStyle {

@@ -65,7 +65,7 @@ def GridStyleTrait(**kwargs):
     ))
 
 
-class GridCrossWidget(ObjectWidget):
+class GridCross(ObjectWidget):
     """TODO: Add docstring here
     """
     _model_name = Unicode('GridCrossModel').tag(sync=True)
