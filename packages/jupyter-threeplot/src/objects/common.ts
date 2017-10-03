@@ -16,8 +16,20 @@ interface IGridStyle {
   minor_style: IGridlineStyle,
 }
 
-export
-const N_MAJOR_TICKS = 3;
 
 export
-const N_MINOR_TICKS = 10;
+interface ITickStyle {
+  label_format: string,
+  line_color: string | null,
+  line_width: number | null,
+  tick_length: number,
+}
+
+export
+interface IAxisStyle {
+  label: string,
+  line_color: string | null,
+  line_width: number | null,
+  minor_tick_format: ITickStyle,
+  major_tick_format: ITickStyle,
+}

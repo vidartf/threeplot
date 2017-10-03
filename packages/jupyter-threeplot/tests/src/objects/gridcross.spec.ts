@@ -23,11 +23,15 @@ import {
 
 import {
    IGridStyle, GridCrossModel
-} from '../../../src/objects/grids';
+} from '../../../src';
+
+import {
+  gridLineMaterialFromStyle, createLabel
+} from '../../../src/objects/three/common';
 
 import {
   defaultGridStyle
-} from '../../../src/objects/grids/widgetgrid';
+} from '../../../src/objects/widgets';
 
 
 function emptyGridStyle(): IGridStyle {
@@ -84,7 +88,7 @@ describe('GridCrossModel', () => {
       it('should use parent material when no overrides', () => {
         let style = emptyGridStyle();
         let parentMaterial = new THREE.LineBasicMaterial();
-        let material = GridCrossModel.gridLineMaterialFromStyle(style, parentMaterial);
+        let material = gridLineMaterialFromStyle(style, parentMaterial);
         expect(material.minor).to.be(parentMaterial);
         expect(material.major).to.be(parentMaterial);
       });
@@ -93,7 +97,7 @@ describe('GridCrossModel', () => {
         let style = emptyGridStyle();
         style.line_color = 'blue';
         let parentMaterial = new THREE.LineBasicMaterial();
-        let material = GridCrossModel.gridLineMaterialFromStyle(style, parentMaterial);
+        let material = gridLineMaterialFromStyle(style, parentMaterial);
         expect(material.minor).to.be(material.major);
         expect(material.major).to.not.be(parentMaterial);
       });
@@ -102,7 +106,7 @@ describe('GridCrossModel', () => {
         let style = emptyGridStyle();
         style.line_width = 2;
         let parentMaterial = new THREE.LineBasicMaterial();
-        let material = GridCrossModel.gridLineMaterialFromStyle(style, parentMaterial);
+        let material = gridLineMaterialFromStyle(style, parentMaterial);
         expect(material.minor).to.be(material.major);
         expect(material.major).to.not.be(parentMaterial);
       });
@@ -112,7 +116,7 @@ describe('GridCrossModel', () => {
         style.line_color = 'blue';
         style.line_width = 2;
         let parentMaterial = new THREE.LineBasicMaterial();
-        let material = GridCrossModel.gridLineMaterialFromStyle(style, parentMaterial);
+        let material = gridLineMaterialFromStyle(style, parentMaterial);
         expect(material.minor).to.be(material.major);
         expect(material.major).to.not.be(parentMaterial);
       });
@@ -121,7 +125,7 @@ describe('GridCrossModel', () => {
         let style = emptyGridStyle();
         style.major_style.line_color = 'blue';
         let parentMaterial = new THREE.LineBasicMaterial();
-        let material = GridCrossModel.gridLineMaterialFromStyle(style, parentMaterial);
+        let material = gridLineMaterialFromStyle(style, parentMaterial);
         expect(material.minor).to.be(parentMaterial);
         expect(material.major).to.not.be(parentMaterial);
         expect(material.major.color.getHexString()).to.eql('0000ff');
@@ -131,7 +135,7 @@ describe('GridCrossModel', () => {
         let style = emptyGridStyle();
         style.minor_style.line_color = 'blue';
         let parentMaterial = new THREE.LineBasicMaterial();
-        let material = GridCrossModel.gridLineMaterialFromStyle(style, parentMaterial);
+        let material = gridLineMaterialFromStyle(style, parentMaterial);
         expect(material.major).to.be(parentMaterial);
         expect(material.minor).to.not.be(parentMaterial);
         expect(material.minor.color.getHexString()).to.eql('0000ff');
@@ -142,7 +146,7 @@ describe('GridCrossModel', () => {
         style.major_style.line_color = 'blue';
         style.line_color = 'red';
         let parentMaterial = new THREE.LineBasicMaterial();
-        let material = GridCrossModel.gridLineMaterialFromStyle(style, parentMaterial);
+        let material = gridLineMaterialFromStyle(style, parentMaterial);
         expect(material.minor).to.not.be(parentMaterial);
         expect(material.major).to.not.be(parentMaterial);
         expect(material.minor.color.getHexString()).to.eql('ff0000');
@@ -154,7 +158,7 @@ describe('GridCrossModel', () => {
         style.minor_style.line_color = 'blue';
         style.line_color = 'red';
         let parentMaterial = new THREE.LineBasicMaterial();
-        let material = GridCrossModel.gridLineMaterialFromStyle(style, parentMaterial);
+        let material = gridLineMaterialFromStyle(style, parentMaterial);
         expect(material.minor).to.not.be(parentMaterial);
         expect(material.major).to.not.be(parentMaterial);
         expect(material.minor.color.getHexString()).to.eql('0000ff');
@@ -165,7 +169,7 @@ describe('GridCrossModel', () => {
         let style = emptyGridStyle();
         style.major_style.line_width = 2;
         let parentMaterial = new THREE.LineBasicMaterial();
-        let material = GridCrossModel.gridLineMaterialFromStyle(style, parentMaterial);
+        let material = gridLineMaterialFromStyle(style, parentMaterial);
         expect(material.minor).to.be(parentMaterial);
         expect(material.major).to.not.be(parentMaterial);
         expect(material.major.linewidth).to.eql(2);
@@ -175,7 +179,7 @@ describe('GridCrossModel', () => {
         let style = emptyGridStyle();
         style.minor_style.line_width = 2;
         let parentMaterial = new THREE.LineBasicMaterial();
-        let material = GridCrossModel.gridLineMaterialFromStyle(style, parentMaterial);
+        let material = gridLineMaterialFromStyle(style, parentMaterial);
         expect(material.major).to.be(parentMaterial);
         expect(material.minor).to.not.be(parentMaterial);
         expect(material.minor.linewidth).to.eql(2);
@@ -186,7 +190,7 @@ describe('GridCrossModel', () => {
         style.major_style.line_width = 2;
         style.line_width = 3;
         let parentMaterial = new THREE.LineBasicMaterial();
-        let material = GridCrossModel.gridLineMaterialFromStyle(style, parentMaterial);
+        let material = gridLineMaterialFromStyle(style, parentMaterial);
         expect(material.minor).to.not.be(parentMaterial);
         expect(material.major).to.not.be(parentMaterial);
         expect(material.minor.linewidth).to.eql(3);
@@ -198,7 +202,7 @@ describe('GridCrossModel', () => {
         style.minor_style.line_width = 2;
         style.line_width = 3;
         let parentMaterial = new THREE.LineBasicMaterial();
-        let material = GridCrossModel.gridLineMaterialFromStyle(style, parentMaterial);
+        let material = gridLineMaterialFromStyle(style, parentMaterial);
         expect(material.minor).to.not.be(parentMaterial);
         expect(material.major).to.not.be(parentMaterial);
         expect(material.minor.linewidth).to.eql(2);
@@ -214,7 +218,7 @@ describe('GridCrossModel', () => {
         style.line_width = 4;
         style.line_color = 'green';
         let parentMaterial = new THREE.LineBasicMaterial();
-        let material = GridCrossModel.gridLineMaterialFromStyle(style, parentMaterial);
+        let material = gridLineMaterialFromStyle(style, parentMaterial);
         expect(material.minor).to.not.be(parentMaterial);
         expect(material.major).to.not.be(parentMaterial);
         expect(material.minor.linewidth).to.eql(2);
@@ -231,7 +235,7 @@ describe('GridCrossModel', () => {
       it('should create a sprite with a given color', () => {
         let style = emptyGridStyle();
         style.line_color = 'red';
-        let sprite = GridCrossModel.createLabel('Test string', style);
+        let sprite = createLabel('Test string', style);
         let canvas = sprite.material.map.image as HTMLCanvasElement;
         let data = canvas.getContext('2d')!.getImageData(0, 0, canvas.width, canvas.height).data;
         expect(data.every((value, i) => {
@@ -243,7 +247,7 @@ describe('GridCrossModel', () => {
       it('should create a sprite with a given major color', () => {
         let style = emptyGridStyle();
         style.major_style.line_color = 'red';
-        let sprite = GridCrossModel.createLabel('Test string', style);
+        let sprite = createLabel('Test string', style);
         let canvas = sprite.material.map.image as HTMLCanvasElement;
         let data = canvas.getContext('2d')!.getImageData(0, 0, canvas.width, canvas.height).data;
         expect(data.every((value, i) => {
@@ -255,7 +259,7 @@ describe('GridCrossModel', () => {
       it('should ignore minor color', () => {
         let style = emptyGridStyle();
         style.minor_style.line_color = 'white';
-        let sprite = GridCrossModel.createLabel('Test string', style);
+        let sprite = createLabel('Test string', style);
         let canvas = sprite.material.map.image as HTMLCanvasElement;
         let data = canvas.getContext('2d')!.getImageData(0, 0, canvas.width, canvas.height).data;
         expect(data.every((value, i) => {

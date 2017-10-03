@@ -3,12 +3,10 @@
 
 export {
   ObjectModel
-} from './object'
+} from './object';
 
 export {
-  AxesCrossModel
-} from './axescross'
+  GridCrossModel, CylindricalGridModel, AxesCrossModel
+} from './widgets';
 
-export {
-  GridCrossModel, CylindricalGridModel
-} from './grids'
+export * from './common';

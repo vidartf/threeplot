@@ -13,7 +13,7 @@ import {
 
 import {
   AxesCrossModel
-} from '../../../src/'
+} from '../../../src'
 
 
 describe('AxesCrossModel', () => {

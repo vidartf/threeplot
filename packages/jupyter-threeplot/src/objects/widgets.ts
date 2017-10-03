@@ -3,7 +3,7 @@
 
 
 import {
-  WidgetModel, ManagerBase, unpack_models
+  unpack_models
 } from '@jupyter-widgets/base';
 
 import {
@@ -17,29 +17,29 @@ import {
 } from 'jupyter-scales';
 
 import {
-  ThreeModel, computeBoundingBox, computeBoundingSphere, getModelScene,
-  CameraModel
+  ThreeModel, computeBoundingBox, CameraModel
 } from 'jupyter-threejs';
 
 import {
-  JUPYTER_EXTENSION_VERSION
-} from '../../version';
-
-import {
   ObjectModel
-} from '../object';
+} from './object';
 
 import {
-  IGridStyle, IGridlineStyle, N_MINOR_TICKS, N_MAJOR_TICKS
+  IGridStyle, IGridlineStyle, IAxisStyle, ITickStyle
 } from './common';
 
 import {
-  createGridTriplet, createCylindricalGrids, applyModes, Mode
-} from './threegrid';
+  createGridTriplet, createCylindricalGrids, createAxesCross,
+  N_MINOR_TICKS
+} from './three';
 
 import {
-  computeBoundingCylinder, Cylinder
-} from '../../cylinder';
+  applyModes, Mode
+} from './three/gridcross';
+
+import {
+  computeBoundingCylinder
+} from '../cylinder';
 
 
 
@@ -65,6 +65,30 @@ function defaultGridStyle(options?: Partial<IGridStyle>): IGridStyle {
     ...options,
   }
 }
+
+export
+function defaultTickStyle(options?: Partial<ITickStyle>): ITickStyle {
+  return {
+    label_format: '',
+    line_color: null,
+    line_width: null,
+    tick_length: 1.0,
+    ...options,
+  }
+}
+
+export
+function defaultAxisStyle(options?: Partial<IAxisStyle>): IAxisStyle {
+  return {
+    label: '',
+    line_color: null,
+    line_width: null,
+    minor_tick_format: defaultTickStyle(),
+    major_tick_format: defaultTickStyle(),
+    ...options,
+  }
+}
+
 
 
 
@@ -427,4 +451,54 @@ class CylindricalGridModel<TDomain> extends ObjectModel {
     }
 
   static model_name = 'CylindricalGridModel';
+}
+
+
+
+/**
+ * TODO: Docstring
+ */
+export
+class AxesCrossModel extends ObjectModel {
+  defaults() {
+    return {...super.defaults(),
+      _model_name: AxesCrossModel.model_name,
+
+      scales: null,
+      axes_styles: [defaultAxisStyle({label: 'x', line_color: 'red'}),
+                    defaultAxisStyle({label: 'y', line_color: 'green'}),
+                    defaultAxisStyle({label: 'z', line_color: 'blue'})],
+
+
+      line_color: 'black',
+      line_width: 1.0,
+    };
+  }
+
+  constructThreeObject(): Promise<any> {
+    let material = new THREE.LineBasicMaterial({
+      color: this.get('line_color'),
+      linewidth: this.get('line_width'),
+    });
+
+    let scales: ScaleLinear<number, number>[] = [];
+    if (this.get('scales')) {
+      for (let scale of this.get('scales')) {
+        scales.push(scale.obj);
+      }
+    } else {
+      scales = [scaleLinear(), scaleLinear(), scaleLinear()]
+    };
+
+    let axesStyles = this.get('axes_styles');
+    let result = createAxesCross(scales, axesStyles, material);
+    return Promise.resolve(result);
+  }
+
+  static serializers: ISerializerMap = {
+      ...AxesCrossModel.serializers,
+      scales: { deserialize: unpack_models },
+    }
+
+  static model_name = 'AxesCrossModel';
 }
