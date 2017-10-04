@@ -6,8 +6,8 @@
 
 import pytest
 
-from ..objects.axescross import AxesCrossWidget
+from ..objects.axescross import AxesCross
 
 
 def test_axescross_creation_blank():
-    w = AxesCrossWidget()
+    w = AxesCross()

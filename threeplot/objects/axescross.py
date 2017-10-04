@@ -40,7 +40,7 @@ def AxisStyle(**kwargs):
     ))
 
 
-class AxesCrossWidget(ObjectWidget):
+class AxesCross(ObjectWidget):
     """TODO: Add docstring here
     """
     _model_name = Unicode('AxesCrossModel').tag(sync=True)
