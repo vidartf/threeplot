@@ -5,7 +5,7 @@ import {
 } from 'd3-scale';
 
 import {
-  minorMajorDoublet, getScaleDomainEpsilon, containsApproximate,
+  MinorMajorDoublet, getScaleDomainEpsilon, containsApproximate,
   gridFromGeometries, N_MAJOR_TICKS, N_MINOR_TICKS
 } from './common';
 
@@ -34,11 +34,11 @@ function createPolarGridGeometries<TDomain>(
 
     offset: Cylindrical,
     size: Cylindrical):
-    minorMajorDoublet<THREE.BufferGeometry>[] {
+    MinorMajorDoublet<THREE.BufferGeometry>[] {
   // Steps:
   // 1. Create radial, straight lines in base plane
   // 2. Create concetric circles in base plane
-  const geometries: minorMajorDoublet<THREE.BufferGeometry>[] = [];
+  const geometries: MinorMajorDoublet<THREE.BufferGeometry>[] = [];
 
   // 1.
   const thetaTicks = {
@@ -51,7 +51,7 @@ function createPolarGridGeometries<TDomain>(
   let cylA = offset.clone();
   let cylB = offset.clone();
   cylB.radius += size.radius;
-  const thetaDoublet: minorMajorDoublet<THREE.BufferGeometry> = {
+  const thetaDoublet: MinorMajorDoublet<THREE.BufferGeometry> = {
     minor: new THREE.BufferGeometry(),
     major: new THREE.BufferGeometry()
   };
@@ -88,7 +88,7 @@ function createPolarGridGeometries<TDomain>(
   const radialEps = getScaleDomainEpsilon(radialScale);
   const N_STEPS = Math.floor(CIRCLE_STEPS_PER_DEGREE*(180 * size.theta / Math.PI));
   let swapCyl: Cylindrical;
-  const radialDoublet: minorMajorDoublet<THREE.BufferGeometry> = {
+  const radialDoublet: MinorMajorDoublet<THREE.BufferGeometry> = {
     minor: new THREE.BufferGeometry(),
     major: new THREE.BufferGeometry()
   };

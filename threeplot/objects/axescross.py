@@ -8,7 +8,7 @@
 TODO: Add module docstring
 """
 
-from traitlets import Unicode, Instance, Tuple, Dict, CInt, CFloat
+from traitlets import Unicode, Instance, Tuple, Dict, CInt, CFloat, Enum
 from ipywidgets import widget_serialization
 from ipywidgets.widgets.trait_types import Color
 from ipyscales import LinearScaleWidget
@@ -23,9 +23,11 @@ def TickStyle(**kwargs):
     """A function for creating a tick style trait"""
     return DefaultDict(traits=dict(
         label_format=Unicode(kwargs.get('label_format', '')),
+        label_color=Color(kwargs.get('label_color', None), allow_none=True),
         line_color=Color(kwargs.get('line_color', None), allow_none=True),
         line_width=CFloat(kwargs.get('line_width', None), allow_none=True),
-        tick_length=CFloat(kwargs.get('tick_length', 1.0)),
+        tick_length=CFloat(kwargs.get('tick_length', 0.1)),
+        direction=Enum(['in', 'out'], 'out'),
     ))
 
 def AxisStyle(**kwargs):
@@ -34,8 +36,10 @@ def AxisStyle(**kwargs):
         label=Unicode(kwargs.get('label', '')),
         line_color=Color(kwargs.get('line_color', None), allow_none=True),
         line_width=CFloat(kwargs.get('line_width', None), allow_none=True),
-        minor_tick_format=TickStyle(**kwargs.get('minor_tick_format', dict())),
-        major_tick_format=TickStyle(**kwargs.get('major_tick_format', dict())),
+        minor_tick_format=TickStyle(**kwargs.get('minor_tick_format', dict(
+            tick_length=0.05))),
+        major_tick_format=TickStyle(**kwargs.get('major_tick_format', dict(
+            tick_length=0.1))),
         # TODO: Add axis head (i.e./e.g. arrow head + sizing)
     ))
 

@@ -1,8 +1,12 @@
 
+export
+interface IHasLabelStyle {
+  label_format: string,
+  label_color: string | null;
+}
 
 export
-interface IGridlineStyle {
-  label_format: string,
+interface IGridlineStyle extends IHasLabelStyle {
   line_color: string | null,
   line_width: number | null,
 }
@@ -18,11 +22,11 @@ interface IGridStyle {
 
 
 export
-interface ITickStyle {
-  label_format: string,
+interface ITickStyle extends IHasLabelStyle {
   line_color: string | null,
   line_width: number | null,
   tick_length: number,
+  direction: 'in' | 'out',
 }
 
 export
@@ -33,3 +37,5 @@ interface IAxisStyle {
   minor_tick_format: ITickStyle,
   major_tick_format: ITickStyle,
 }
+
+

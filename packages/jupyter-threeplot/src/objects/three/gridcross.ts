@@ -9,30 +9,15 @@ import {
 } from '../common';
 
 import {
-  minorMajorDoublet, getScaleDomainEpsilon, containsApproximate,
-  createLabel, gridFromGeometries, LABEL_RELATIVE_OFFSET,
-  N_MAJOR_TICKS, N_MINOR_TICKS
+  MinorMajorDoublet, getScaleDomainEpsilon, containsApproximate,
+  createLabel, gridFromGeometries, getGridTripletBounds,
+  LABEL_RELATIVE_OFFSET, N_MAJOR_TICKS, N_MINOR_TICKS
 } from './common';
 
 
 const ZERO = new THREE.Vector3();
 const UNIT_VECTORS = [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1)];
 
-interface IBounds { offset: THREE.Vector3, size: THREE.Vector3 };
-
-
-
-function getGridTripletBounds<TDomain>(scales: ScaleContinuousNumeric<number, TDomain>[]): IBounds {
-  let mins = scales.map(scale => {
-    return Math.min(...scale.range());
-  });
-  let maxs = scales.map(scale => {
-    return Math.max(...scale.range());
-  });
-  let offset = new THREE.Vector3(mins[0], mins[1], mins[2]);
-  let size = (new THREE.Vector3(maxs[0], maxs[1], maxs[2])).sub(offset);
-  return {offset, size};
-}
 
 export
 type Mode = 'min' | 'max' | 'minmax' | 'zero';
@@ -100,7 +85,7 @@ function createParallelLinesGeometry<TDomain>(scale: ScaleContinuousNumeric<numb
                                            offset: THREE.Vector3,
                                            scaleVector: THREE.Vector3,
                                            lineVector: THREE.Vector3):
-                                           minorMajorDoublet<THREE.BufferGeometry> {
+                                           MinorMajorDoublet<THREE.BufferGeometry> {
 
   const ticks = {
     minor: scale.ticks(N_MINOR_TICKS),
@@ -143,8 +128,8 @@ function createRectLineGeometries<TDomain>(scales: ScaleContinuousNumeric<number
                                        axes: number[],
                                        offset: THREE.Vector3,
                                        size: THREE.Vector3):
-                                       minorMajorDoublet<THREE.BufferGeometry>[] {
-  const geometries: minorMajorDoublet<THREE.BufferGeometry>[] = [];
+                                       MinorMajorDoublet<THREE.BufferGeometry>[] {
+  const geometries: MinorMajorDoublet<THREE.BufferGeometry>[] = [];
   const lineVector = new THREE.Vector3();
   const scaleVector = new THREE.Vector3();
   for (let i=0; i<2; ++i) {
@@ -193,7 +178,7 @@ function createGridTriplet<TDomain>(scales: ScaleContinuousNumeric<number, TDoma
   const gridOffset = new THREE.Vector3();
   const bounds = getGridTripletBounds(scales);
   const grids = [];
-  let geometries: minorMajorDoublet<THREE.BufferGeometry>[];
+  let geometries: MinorMajorDoublet<THREE.BufferGeometry>[];
   for (let axes of tripletIndices) {
     const iNormal = axes.indexOf(0) === -1 ? 0 : axes.indexOf(1) === -1 ? 1 : 2;
     gridOffset.copy(bounds.offset).setComponent(iNormal, 0);
@@ -203,18 +188,17 @@ function createGridTriplet<TDomain>(scales: ScaleContinuousNumeric<number, TDoma
     grids.push(grid);
   }
 
+  // Add major tick labels:
   const tick_label_groups = [];
   let minSize = Math.min(...bounds.size.toArray());
   for (let axes of tripletIndices) {
     const iNormal = axes.indexOf(0) === -1 ? 0 : axes.indexOf(1) === -1 ? 1 : 2;
     gridOffset.copy(bounds.offset).setComponent(iNormal, 0);
-    // Add major tick labels:
     let scale = scales[axes[0]];
     let tickFormat = scale.tickFormat(N_MAJOR_TICKS);
-    const vector = new THREE.Vector3();
     const tick_labels = [];
     for (let tick of scale.ticks(N_MAJOR_TICKS)) {
-      let sprite = createLabel(tickFormat(tick), styles[axes[0]]);
+      let sprite = createLabel(tickFormat(tick), styles[axes[0]].major_style);
       sprite.position.addScaledVector(UNIT_VECTORS[axes[0]], tick);
       sprite.scale.multiplyScalar(minSize);
       tick_labels.push(sprite);

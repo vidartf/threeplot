@@ -12,15 +12,19 @@ import {
   IAxisStyle
 } from '../common';
 
+import {
+  getScaleDomainEpsilon, createLabel, getGridTripletBounds,
+  MinorMajorDoublet,
+  N_MAJOR_TICKS, N_MINOR_TICKS, LABEL_RELATIVE_OFFSET
+} from './common';
+
+import {
+  Ticks
+} from './ticks';
 
 
 const axisGeometry: THREE.BufferGeometry = new THREE.BufferGeometry()
 axisGeometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array([0,0,0, 1,0,0]), 3));
-
-function getScaleDomainEpsilon(scale: ScaleContinuousNumeric<number, number>, relativePrecision=1e-7): number {
-  let domain = scale.domain();
-  return (Math.max(...domain) - Math.min(...domain)) * relativePrecision;
-}
 
 
 /**
@@ -42,16 +46,20 @@ function createAxesCross<TDomain>(
     styles: IAxisStyle[],
     parentMaterial: THREE.LineBasicMaterial): THREE.Group {
 
-  let result = new THREE.Group();
-  let axes = [];
+  const bounds = getGridTripletBounds(scales);
+  const minSize = Math.min(...bounds.size.toArray());
+  const result = new THREE.Group();
+  const axes = [];
   for (let i=0; i < 3; ++i) {
-    let scale = scales[i];
-    let style = styles[i];
-    let axis = axisFromScale(scale, style, parentMaterial);
+    const scale = scales[i];
+    const style = styles[i];
+    const axis = axisFromScale(scale, style, parentMaterial, minSize);
     if (i === 1) {
       axis.rotateZ(0.5 * Math.PI);
+      axis.rotateX(0.5 * Math.PI);
     } else if (i === 2) {
       axis.rotateY(-0.5 * Math.PI);
+      axis.rotateX(Math.PI);
     }
     result.add(axis);
   }
@@ -63,7 +71,9 @@ export
 function axisFromScale<TDomain>(
     scale: ScaleContinuousNumeric<number, TDomain>,
     style: IAxisStyle,
-    parentMaterial: THREE.LineBasicMaterial): THREE.Group {
+    parentMaterial: THREE.LineBasicMaterial,
+    scaleFactor: number,
+    ): THREE.Group {
   let material = parentMaterial;
   if (style.line_color || style.line_width) {
     material = new THREE.LineBasicMaterial({
@@ -72,9 +82,65 @@ function axisFromScale<TDomain>(
     });
   }
   let result = new THREE.Group();
-  // TODO: Add tick markers
-
+  // Add axis:
   result.add(new THREE.Line(axisGeometry, material));
+
+  // Add tick markers:
+  const ticks = {
+    minor: scale.ticks(N_MINOR_TICKS),
+    major: scale.ticks(N_MAJOR_TICKS),
+  };
+  const tickStyle = {
+    minor: style.minor_tick_format,
+    major: style.major_tick_format,
+  }
+
+  const tickVector = new THREE.Vector3();
+  const eps = getScaleDomainEpsilon(scale);
+  for (const which of ['minor', 'major'] as ('minor' | 'major')[]) {
+    const tickPositions: THREE.Vector3[] = [];
+    switch (tickStyle[which].direction) {
+      case 'in':
+        tickVector.set(0, 0, tickStyle[which].tick_length);
+        break;
+      case 'out':
+        tickVector.set(0, 0, -tickStyle[which].tick_length);
+        break;
+      default:
+        throw new Error(`Invalid tick direction: ${tickStyle[which].direction}`);
+    }
+
+    for (const tick of ticks[which]) {
+      // Skip minor ticks which are also major ticks
+      if (which === 'minor' && containsApproximate(ticks['major'], tick, eps)) {
+        continue;
+      }
+      tickPositions.push(new THREE.Vector3(tick))
+    }
+    result.add(new Ticks(tickPositions, tickVector, material));
+    result.add(new Ticks(tickPositions, tickVector, material));
+  }
+
+  // Add major tick labels:
+  const tickFormat = scale.tickFormat(N_MAJOR_TICKS);
+  const tick_labels = [];
+  let labelTickOffset = 0.03;
+  if (tickStyle['major'].direction === 'out') {
+    labelTickOffset += Math.max(
+      tickStyle['major'].tick_length,
+      tickStyle['minor'].tick_length);
+  }
+  for (let tick of ticks['major']) {
+    const sprite = createLabel(tickFormat(tick), style.major_tick_format);
+    sprite.position.setX(tick);
+    sprite.position.setZ(- (LABEL_RELATIVE_OFFSET * scaleFactor + labelTickOffset));
+    sprite.scale.multiplyScalar(scaleFactor);
+    tick_labels.push(sprite);
+  }
+  const labelGroup = new THREE.Group()
+  labelGroup.add(...tick_labels);
+  result.add(labelGroup);
+
   return result;
 }
 

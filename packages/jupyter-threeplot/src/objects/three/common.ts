@@ -6,7 +6,7 @@ import {
 } from 'd3-scale';
 
 import {
-  IGridStyle, IGridlineStyle
+  IGridStyle, IGridlineStyle, IHasLabelStyle
 } from '../common';
 
 
@@ -50,7 +50,23 @@ function containsApproximate(sequence: number[], value: number, precision: numbe
 }
 
 export
-interface minorMajorDoublet<T> {
+interface IBounds { offset: THREE.Vector3, size: THREE.Vector3 };
+
+export
+function getGridTripletBounds<TDomain>(scales: ScaleContinuousNumeric<number, TDomain>[]): IBounds {
+  let mins = scales.map(scale => {
+    return Math.min(...scale.range());
+  });
+  let maxs = scales.map(scale => {
+    return Math.max(...scale.range());
+  });
+  let offset = new THREE.Vector3(mins[0], mins[1], mins[2]);
+  let size = (new THREE.Vector3(maxs[0], maxs[1], maxs[2])).sub(offset);
+  return {offset, size};
+}
+
+export
+interface MinorMajorDoublet<T> {
   minor: T,
   major: T
 }
@@ -58,7 +74,7 @@ interface minorMajorDoublet<T> {
 export
 function gridLineMaterialFromStyle(style: IGridStyle,
                                    parentMaterial: THREE.LineBasicMaterial):
-                                   minorMajorDoublet<THREE.LineBasicMaterial> {
+                                   MinorMajorDoublet<THREE.LineBasicMaterial> {
   let major = parentMaterial;
   let minor = parentMaterial;
   if (style.major_style.line_color === null &&
@@ -94,10 +110,10 @@ function gridLineMaterialFromStyle(style: IGridStyle,
 }
 
 export
-function createLabel(text: string, style: IGridStyle): THREE.Sprite {
+function createLabel(text: string, style: IHasLabelStyle): THREE.Sprite {
   const fontFace = 'Arial';
   const size = 36;
-  const color = style.major_style.line_color || style.line_color || 'black';
+  const color = style.label_color || 'black';
 
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d')!;
@@ -133,7 +149,7 @@ function createLabel(text: string, style: IGridStyle): THREE.Sprite {
  * will be applied to geometry doublet 0.
  */
 export
-function gridFromGeometries<TDomain>(geometries: minorMajorDoublet<THREE.BufferGeometry>[],
+function gridFromGeometries<TDomain>(geometries: MinorMajorDoublet<THREE.BufferGeometry>[],
                                      style: IGridStyle,
                                      parentMaterial: THREE.LineBasicMaterial): THREE.Object3D {
 

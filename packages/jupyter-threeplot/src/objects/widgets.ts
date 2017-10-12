@@ -48,6 +48,7 @@ export
 function defaultGridlineStyle(options?: Partial<IGridlineStyle>): IGridlineStyle {
   return {
     label_format: '',
+    label_color: null,
     line_width: null,
     line_color: null,
     ...options,
@@ -70,9 +71,11 @@ export
 function defaultTickStyle(options?: Partial<ITickStyle>): ITickStyle {
   return {
     label_format: '',
+    label_color: null,
     line_color: null,
     line_width: null,
     tick_length: 1.0,
+    direction: 'out',
     ...options,
   }
 }
@@ -83,8 +86,8 @@ function defaultAxisStyle(options?: Partial<IAxisStyle>): IAxisStyle {
     label: '',
     line_color: null,
     line_width: null,
-    minor_tick_format: defaultTickStyle(),
-    major_tick_format: defaultTickStyle(),
+    minor_tick_format: defaultTickStyle({tick_length: 0.05}),
+    major_tick_format: defaultTickStyle({tick_length: 0.1}),
     ...options,
   }
 }
