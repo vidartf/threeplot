@@ -13,7 +13,7 @@ import * as yourCode from 'jupyter-threeplot';
 
 import {
   INBWidgetExtension
- } from "@jupyter-widgets/jupyterlab-manager";
+ } from "@jupyter-widgets/base";
 
 
 const EXTENSION_ID = 'jupter.extensions.threeplot'
