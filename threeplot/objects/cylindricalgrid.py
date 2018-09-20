@@ -14,14 +14,14 @@ from traitlets import Unicode, Instance, Tuple, Dict, CInt, CFloat, Bool, Union,
 from ipywidgets import widget_serialization
 from ipywidgets.widgets.trait_types import Color
 from pythreejs import Scene, Object3D, Camera
-from ipyscales import LinearScaleWidget
+from ipyscales import ContinuousScale
 
 from .object import ObjectWidget
 from .gridcross import AxisScale, GridStyleTrait
 from ..trait_types import DefaultDict, DefaultTuple
 
 
-AxisScale = Instance(LinearScaleWidget)
+AxisScale = Instance(ContinuousScale)
 
 
 class CylindricalGrid(ObjectWidget):

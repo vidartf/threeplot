@@ -18,8 +18,7 @@ interface ILineUniforms {
 }
 
 export
-const lineUniforms: ILineUniforms = {
-
+const lineUniforms = {
     linewidth: { value: 1 },
     resolution: { value: new THREE.Vector2( 1, 1 ) }
 
@@ -213,15 +212,16 @@ class LineMaterial extends THREE.ShaderMaterial {
 
         super({
 
-            uniforms: THREE.UniformsUtils.clone( THREE.ShaderLib[ 'line' ].uniforms ),
+            uniforms: THREE.UniformsUtils.clone(lineShader.uniforms),
 
-            vertexShader: THREE.ShaderLib[ 'line' ].vertexShader,
-            fragmentShader: THREE.ShaderLib[ 'line' ].fragmentShader,
+            vertexShader: lineShader.vertexShader,
+            fragmentShader: lineShader.fragmentShader,
 
-            ...parameters
         } );
 
         this.type = 'LineMaterial';
+
+        this.setValues( parameters! );
     }
 
     get color() {
@@ -237,7 +237,9 @@ class LineMaterial extends THREE.ShaderMaterial {
     }
 
     set linewidth( value ) {
-        this.uniforms['linewidth'].value = value;
+        if (this.uniforms['linewidth'] !== undefined) {
+            this.uniforms['linewidth'].value = value;
+        }
     }
 
     get resolution() {

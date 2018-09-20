@@ -3,12 +3,12 @@ import * as THREE from 'three';
 
 
 import {
-  LineMaterial, lineUniforms
+  LineMaterial, lineShader
 } from '../../vendored/linematerial';
 
 
-const vertexShader = require("./glsl/vertex-ticks.glsl");
-const fragmentShader = require("./glsl/fragment-ticks.glsl");
+const vertexShader = require("./glsl/vertex-axis.glsl");
+const fragmentShader = require("./glsl/ticks.glsl");
 
 export
 interface ITickUniforms {
@@ -29,7 +29,7 @@ class TickMaterial extends LineMaterial {
   constructor(params?: THREE.ShaderMaterialParameters) {
     super({
       uniforms: THREE.UniformsUtils.merge([
-        lineUniforms, tickUniforms]),
+        lineShader.uniforms, tickUniforms]),
       vertexShader,
       fragmentShader,
       ...params
@@ -57,8 +57,6 @@ class TicksGeometry extends THREE.InstancedBufferGeometry {
     super();
 
     this.type = 'TickGeometry';
-
-    var plane = new THREE.BufferGeometry();
 
     var positions = [ - 1, 2, 0, 1, 2, 0, - 1, 1, 0, 1, 1, 0, - 1, 0, 0, 1, 0, 0, - 1, - 1, 0, 1, - 1, 0 ];
     var uvs = [ 0, 1, 1, 1, 0, .5, 1, .5, 0, .5, 1, .5, 0, 0, 1, 0 ];

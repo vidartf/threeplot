@@ -11,13 +11,13 @@ TODO: Add module docstring
 from traitlets import Unicode, Instance, Tuple, Dict, CInt, CFloat, Enum
 from ipywidgets import widget_serialization
 from ipywidgets.widgets.trait_types import Color
-from ipyscales import LinearScaleWidget
+from ipyscales import ContinuousScale
 
 from .object import ObjectWidget
 from ..trait_types import DefaultDict, DefaultTuple
 
 
-AxisScale = Instance(LinearScaleWidget)
+AxisScale = Instance(ContinuousScale)
 
 def TickStyle(**kwargs):
     """A function for creating a tick style trait"""

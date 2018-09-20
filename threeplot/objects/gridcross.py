@@ -14,11 +14,11 @@ from ipywidgets.widgets.trait_types import Color
 from pythreejs import Scene, Object3D, Camera
 
 from .object import ObjectWidget
-from ipyscales import LinearScaleWidget
+from ipyscales import ContinuousScale
 from ..trait_types import DefaultDict, DefaultTuple
 
 
-AxisScale = Instance(LinearScaleWidget)
+AxisScale = Instance(ContinuousScale)
 
 def GridlineStyle(**kwargs):
     """A function for creating a gridline style value"""

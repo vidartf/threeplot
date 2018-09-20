@@ -19,6 +19,9 @@ import {
 
 const CIRCLE_STEPS_PER_DEGREE = 1;
 
+const rad2deg = 180 / Math.PI;
+
+
 /**
  * Create geometries for a polar grid (base plane)
  *
@@ -27,14 +30,13 @@ const CIRCLE_STEPS_PER_DEGREE = 1;
  * @param offset
  * @param size
  */
-export
-function createPolarGridGeometries<TDomain>(
-    radialScale: ScaleContinuousNumeric<number, TDomain>,
-    azimuthalScale: ScaleContinuousNumeric<number, TDomain>,
+export function createPolarGridGeometries(
+  radialScale: ScaleContinuousNumeric<number, number>,
+  azimuthalScale: ScaleContinuousNumeric<number, number>,
 
-    offset: Cylindrical,
-    size: Cylindrical):
-    MinorMajorDoublet<THREE.BufferGeometry>[] {
+  offset: Cylindrical,
+  size: Cylindrical
+): MinorMajorDoublet<THREE.BufferGeometry>[] {
   // Steps:
   // 1. Create radial, straight lines in base plane
   // 2. Create concetric circles in base plane
@@ -64,7 +66,7 @@ function createPolarGridGeometries<TDomain>(
         continue;
       }
 
-      cylA.theta = cylB.theta = tick;
+      cylA.theta = cylB.theta = azimuthalScale(tick);
 
       (vertexA as any).setFromCylindrical(cylA);
       (vertexB as any).setFromCylindrical(cylB);
@@ -86,7 +88,7 @@ function createPolarGridGeometries<TDomain>(
     major: radialScale.ticks(N_MAJOR_TICKS),
   }
   const radialEps = getScaleDomainEpsilon(radialScale);
-  const N_STEPS = Math.floor(CIRCLE_STEPS_PER_DEGREE*(180 * size.theta / Math.PI));
+  const N_STEPS = Math.floor(CIRCLE_STEPS_PER_DEGREE * size.theta * rad2deg);
   let swapCyl: Cylindrical;
   const radialDoublet: MinorMajorDoublet<THREE.BufferGeometry> = {
     minor: new THREE.BufferGeometry(),
@@ -94,7 +96,6 @@ function createPolarGridGeometries<TDomain>(
   };
   for (const which of ['minor', 'major'] as ('minor' | 'major')[]) {
     const vertices: number[] = [];
-    const geometry = new THREE.BufferGeometry();
 
     for (const tick of radialTicks[which]) {
       // Skip minor ticks which are also major ticks
@@ -104,7 +105,7 @@ function createPolarGridGeometries<TDomain>(
 
       cylA.copy(offset);
       cylB.copy(offset);
-      cylA.radius = cylB.radius = tick;
+      cylA.radius = cylB.radius = radialScale(tick);
 
       for (let step=1; step<N_STEPS; ++step) {
         cylB.theta = offset.theta + size.theta * step / (N_STEPS - 1);
@@ -131,22 +132,22 @@ function createPolarGridGeometries<TDomain>(
 }
 
 
-export
-function createCylindricalGrids<TDomain>(scales: ScaleContinuousNumeric<number, TDomain>[],
-                                         styles: IGridStyle[],
-                                         parentMaterial: THREE.LineBasicMaterial):
-                                         THREE.Group {
+export function createCylindricalGrids(
+  scales: ScaleContinuousNumeric<number, number>[],
+  styles: IGridStyle[],
+  parentMaterial: THREE.LineBasicMaterial
+): THREE.Group {
   let result = new THREE.Group();
 
   let offset = new (THREE as any).Cylindrical(
-    Math.min(...scales[0].domain()),
-    Math.min(...scales[1].domain()),
-    Math.min(...scales[2].domain())
+    Math.min(...scales[0].range()),
+    Math.min(...scales[1].range()),
+    Math.min(...scales[2].range())
   ) as Cylindrical;
   let size = new (THREE as any).Cylindrical(
-    Math.max(...scales[0].domain()) - offset.radius,
-    Math.max(...scales[1].domain()) - offset.theta,
-    Math.max(...scales[2].domain()) - offset.y
+    Math.max(...scales[0].range()) - offset.radius,
+    Math.max(...scales[1].range()) - offset.theta,
+    Math.max(...scales[2].range()) - offset.y
   ) as Cylindrical;
 
   let geometries = createPolarGridGeometries(scales[0], scales[1], offset, size);

@@ -100,7 +100,7 @@ function defaultAxisStyle(options?: Partial<IAxisStyle>): IAxisStyle {
  * TODO: Docstring
  */
 export
-class GridCrossModel<TDomain> extends ObjectModel {
+class GridCrossModel extends ObjectModel {
   defaults() {
     return {...super.defaults(),
       _model_name: GridCrossModel.model_name,
@@ -209,10 +209,10 @@ class GridCrossModel<TDomain> extends ObjectModel {
    * Grid scales are copies of the model scales, but whos domain/range
    * can autoscale with the scene.
    *
-   * @param {(ScaleContinuousNumeric<number, TDomain | number>[])} scales
+   * @param {(ScaleContinuousNumeric<number, number>[])} scales
    * @memberof GridCrossModel
    */
-  createGridScales(scales: ScaleContinuousNumeric<number, TDomain | number>[]): void {
+  createGridScales(scales: ScaleContinuousNumeric<number, number>[]): void {
 
     /*
     Note about auto-sizing axes scales:
@@ -251,7 +251,7 @@ class GridCrossModel<TDomain> extends ObjectModel {
       linewidth: this.get('line_width'),
     });
 
-    let scales: ScaleContinuousNumeric<number, TDomain | number>[];
+    let scales: ScaleContinuousNumeric<number, number>[];
     if (this.get('scales')) {
       scales = (this.get('scales') as ScaleModel[]).map(scale => scale.obj);
     } else {
@@ -271,7 +271,7 @@ class GridCrossModel<TDomain> extends ObjectModel {
     return triplet;
   }
 
-  gridScales: ScaleContinuousNumeric<number, TDomain | number>[];
+  gridScales: ScaleContinuousNumeric<number, number>[];
   sceneSize: number[][] | null;
 
   static serializers: ISerializerMap = {
@@ -290,7 +290,7 @@ class GridCrossModel<TDomain> extends ObjectModel {
  * TODO: Docstring
  */
 export
-class CylindricalGridModel<TDomain> extends ObjectModel {
+class CylindricalGridModel extends ObjectModel {
   defaults() {
     return {...super.defaults(),
       _model_name: CylindricalGridModel.model_name,
@@ -390,7 +390,7 @@ class CylindricalGridModel<TDomain> extends ObjectModel {
    * @param {(ScaleContinuousNumeric[])} scales
    * @memberof GridCrossModel
    */
-  createGridScales(scales: ScaleContinuousNumeric<number, TDomain | number>[]): void {
+  createGridScales(scales: ScaleContinuousNumeric<number, number>[]): void {
 
     /*
     Note about auto-sizing axes scales:
@@ -429,7 +429,7 @@ class CylindricalGridModel<TDomain> extends ObjectModel {
       linewidth: this.get('line_width'),
     });
 
-    let scales: ScaleContinuousNumeric<number, TDomain | number>[];
+    let scales: ScaleContinuousNumeric<number, number>[];
     if (this.get('scales')) {
       scales = (this.get('scales') as ScaleModel[]).map(scale => scale.obj);
     } else {
@@ -444,7 +444,7 @@ class CylindricalGridModel<TDomain> extends ObjectModel {
     return cylGrid;
   }
 
-  gridScales: ScaleContinuousNumeric<number, TDomain | number>[];
+  gridScales: ScaleContinuousNumeric<number, number>[];
   sceneSize: number[][] | null;
 
   static serializers: ISerializerMap = {

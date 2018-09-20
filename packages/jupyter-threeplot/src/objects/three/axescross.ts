@@ -3,7 +3,7 @@
 
 
 import {
-  scaleLinear, ScaleContinuousNumeric
+  ScaleContinuousNumeric
 } from 'd3-scale';
 
 import * as THREE from 'three';
@@ -14,7 +14,6 @@ import {
 
 import {
   getScaleDomainEpsilon, createLabel, getGridTripletBounds,
-  MinorMajorDoublet,
   N_MAJOR_TICKS, N_MINOR_TICKS, LABEL_RELATIVE_OFFSET
 } from './common';
 
@@ -41,8 +40,8 @@ function containsApproximate(sequence: number[], value: number, precision: numbe
 
 
 export
-function createAxesCross<TDomain>(
-    scales: ScaleContinuousNumeric<number, TDomain>[],
+function createAxesCross(
+    scales: ScaleContinuousNumeric<number, number>[],
     styles: IAxisStyle[],
     parentMaterial: THREE.LineBasicMaterial): THREE.Group {
 
@@ -68,8 +67,8 @@ function createAxesCross<TDomain>(
 }
 
 export
-function axisFromScale<TDomain>(
-    scale: ScaleContinuousNumeric<number, TDomain>,
+function axisFromScale(
+    scale: ScaleContinuousNumeric<number, number>,
     style: IAxisStyle,
     parentMaterial: THREE.LineBasicMaterial,
     scaleFactor: number,
@@ -98,7 +97,7 @@ function axisFromScale<TDomain>(
   const tickVector = new THREE.Vector3();
   const eps = getScaleDomainEpsilon(scale);
   for (const which of ['minor', 'major'] as ('minor' | 'major')[]) {
-    const tickPositions: THREE.Vector3[] = [];
+    const tickPositions: number[] = [];
     switch (tickStyle[which].direction) {
       case 'in':
         tickVector.set(0, 0, tickStyle[which].tick_length);
@@ -115,7 +114,7 @@ function axisFromScale<TDomain>(
       if (which === 'minor' && containsApproximate(ticks['major'], tick, eps)) {
         continue;
       }
-      tickPositions.push(new THREE.Vector3(tick))
+      tickPositions.push(tick, 0, 0);
     }
     result.add(new Ticks(tickPositions, tickVector, material));
     result.add(new Ticks(tickPositions, tickVector, material));

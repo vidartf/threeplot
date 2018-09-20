@@ -27,10 +27,11 @@
   "scripts": {
     "clean": "rimraf build",
     "build": "tsc --project src",
-    "prepublish": "npm run clean && npm run build"
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "files": [
-    "build/*.js"
+    "build/*.js",
+    "src/**/*"
   ],
   "repository": {
     "type": "git",

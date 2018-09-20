@@ -10,10 +10,11 @@ import {
 
 
 export
-function createTriRectGrids<TDomain>(scales: ScaleContinuousNumeric<number, TDomain>[],
-                                     styles: IGridStyle[],
-                                     parentMaterial: THREE.LineBasicMaterial):
-                                     THREE.Group {
+function createTriRectGrids(
+  scales: ScaleContinuousNumeric<number, number>[],
+  styles: IGridStyle[],
+  parentMaterial: THREE.LineBasicMaterial
+): THREE.Group {
   let result = new THREE.Group();
   return result;
 }

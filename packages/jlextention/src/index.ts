@@ -12,7 +12,7 @@ import {
 import * as yourCode from 'jupyter-threeplot';
 
 import {
-  INBWidgetExtension
+  IJupyterWidgetRegistry
  } from "@jupyter-widgets/base";
 
 
@@ -38,7 +38,7 @@ interface IThreePlotExtension {
  */
 const threePlotProvider: JupyterLabPlugin<IThreePlotExtension> = {
   id: EXTENSION_ID,
-  requires: [INBWidgetExtension],
+  requires: [IJupyterWidgetRegistry],
   activate: activateWidgetExtension,
   autoStart: true
 };
@@ -49,11 +49,11 @@ export default threePlotProvider;
 /**
  * Activate the widget extension.
  */
-function activateWidgetExtension(app: JupyterLab, widgetsManager: INBWidgetExtension): IThreePlotExtension {
+function activateWidgetExtension(app: JupyterLab, widgetsManager: IJupyterWidgetRegistry): IThreePlotExtension {
   widgetsManager.registerWidget({
       name: 'jupyter-threeplot',
       version: yourCode.JUPYTER_EXTENSION_VERSION,
-      exports: yourCode
+      exports: yourCode as any
     });
   return {};
 }

@@ -1,7 +1,7 @@
-var loaders = [
+var rules = [
   { test: /\.ts$/, loader: 'ts-loader' },
-  { test: /\.json$/, loader: 'json-loader' },
   { test: /\.js$/, loader: "source-map-loader" },
+  { test: /\.glsl$/, loader: 'webpack-glsl-loader' },
 ];
 
 module.exports = {
@@ -12,12 +12,12 @@ module.exports = {
     libraryTarget: 'amd'
   },
   module: {
-    rules: loaders
+    rules
   },
   devtool: 'source-map',
   externals: ['@jupyter-widgets/base', 'jupyter-datawidgets', 'jupyter-threejs', 'three'],
   resolve: {
-    // Add '.ts' and '.tsx' as resolvable extensions.
-    extensions: [".webpack.js", ".web.js", ".ts", ".js"]
+    // Add '.ts' and '.glsl' as resolvable extensions.
+    extensions: [".webpack.js", ".web.js", ".ts", ".js", ".glsl"]
   }
 };

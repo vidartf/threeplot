@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 import {
-  scaleLinear, ScaleLinear, ScaleContinuousNumeric
+  scaleLinear, ScaleContinuousNumeric
 } from 'd3-scale';
 
 import {
@@ -15,14 +15,13 @@ import {
 } from './common';
 
 
-const ZERO = new THREE.Vector3();
 const UNIT_VECTORS = [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1)];
 
 
 export
 type Mode = 'min' | 'max' | 'minmax' | 'zero';
 
-function getMinMax<TDomain>(planeIndex: number, camera: THREE.Camera): 'min' | 'max' {
+function getMinMax(planeIndex: number, camera: THREE.Camera): 'min' | 'max' {
   let cameraDirection = new THREE.Vector3();
   let planeNormal = UNIT_VECTORS[2-planeIndex];
   camera.getWorldDirection(cameraDirection);
@@ -35,10 +34,13 @@ function getMinMax<TDomain>(planeIndex: number, camera: THREE.Camera): 'min' | '
 }
 
 export
-function applyModes<TDomain>(triplet: THREE.Group, modes: Mode[], camera: THREE.Camera | null, scales: ScaleContinuousNumeric<number, TDomain>[]) {
+function applyModes(
+  triplet: THREE.Group,
+  modes: Mode[],
+  camera: THREE.Camera | null,
+  scales: ScaleContinuousNumeric<number, number>[]
+): void {
   const bounds = getGridTripletBounds(scales);
-  const tripletIndices = [[0, 1], [2, 0], [1, 2]];  // XY, ZX, YZ
-  let minSize = Math.min(...bounds.size.toArray());
   for (let i=0; i<3; ++i) {
     let mode = modes[i];
     if (mode === 'minmax') {
@@ -74,18 +76,19 @@ function applyModes<TDomain>(triplet: THREE.Group, modes: Mode[], camera: THREE.
  * lineVector. The lines will be spaced acording to the scale's tick positions
  * along the scaleUnitVector.
  *
- * @param {ScaleContinuousNumeric<number, TDomain>} scale: d3-scale to use for ticks
+ * @param {ScaleContinuousNumeric<number, number>} scale: d3-scale to use for ticks
  * @param {THREE.Vector3} offset: the starting point of the grid
  * @param {THREE.Vector3} scaleUnitVector: unit vector pointing along the scale direction
  * @param {THREE.Vector3} lineVector: the vector describing the grid line (direction and length)
  * @returns {minorMajorDoublet<THREE.BufferGeometry>}
  */
 export
-function createParallelLinesGeometry<TDomain>(scale: ScaleContinuousNumeric<number, TDomain>,
-                                           offset: THREE.Vector3,
-                                           scaleVector: THREE.Vector3,
-                                           lineVector: THREE.Vector3):
-                                           MinorMajorDoublet<THREE.BufferGeometry> {
+function createParallelLinesGeometry(
+  scale: ScaleContinuousNumeric<number, number>,
+  offset: THREE.Vector3,
+  scaleVector: THREE.Vector3,
+  lineVector: THREE.Vector3
+): MinorMajorDoublet<THREE.BufferGeometry> {
 
   const ticks = {
     minor: scale.ticks(N_MINOR_TICKS),
@@ -124,11 +127,12 @@ function createParallelLinesGeometry<TDomain>(scale: ScaleContinuousNumeric<numb
 }
 
 export
-function createRectLineGeometries<TDomain>(scales: ScaleContinuousNumeric<number, TDomain>[],
-                                       axes: number[],
-                                       offset: THREE.Vector3,
-                                       size: THREE.Vector3):
-                                       MinorMajorDoublet<THREE.BufferGeometry>[] {
+function createRectLineGeometries(
+  scales: ScaleContinuousNumeric<number, number>[],
+  axes: number[],
+  offset: THREE.Vector3,
+  size: THREE.Vector3
+): MinorMajorDoublet<THREE.BufferGeometry>[] {
   const geometries: MinorMajorDoublet<THREE.BufferGeometry>[] = [];
   const lineVector = new THREE.Vector3();
   const scaleVector = new THREE.Vector3();
@@ -152,7 +156,11 @@ function createRectLineGeometries<TDomain>(scales: ScaleContinuousNumeric<number
   return geometries;
 }
 
-function labelRectAxesOffsets(offset: THREE.Vector3, size: THREE.Vector3, axes: number[]): THREE.Vector3 {
+function labelRectAxesOffsets(
+  offset: THREE.Vector3,
+  size: THREE.Vector3,
+  axes: number[]
+): THREE.Vector3 {
   let minSize = Math.min(...size.toArray());
   //const i = axes.indexOf(0) === -1 ? 0 : axes.indexOf(1) === -1 ? 1 : 2;
   const i = axes[0];
@@ -169,10 +177,11 @@ function labelRectAxesOffsets(offset: THREE.Vector3, size: THREE.Vector3, axes: 
  * Create three grids (XY/XZ/YZ) from three scale/style pairs.
  */
 export
-function createGridTriplet<TDomain>(scales: ScaleContinuousNumeric<number, TDomain>[],
-                              styles: IGridStyle[],
-                              parentMaterial: THREE.LineBasicMaterial):
-                              THREE.Group {
+function createGridTriplet(
+  scales: ScaleContinuousNumeric<number, number>[],
+  styles: IGridStyle[],
+  parentMaterial: THREE.LineBasicMaterial
+): THREE.Group {
   // TODO: Take optional material cache?
   const tripletIndices = [[0, 1], [2, 0], [1, 2]];  // XY, ZX, YZ
   const gridOffset = new THREE.Vector3();

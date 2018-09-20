@@ -8,7 +8,7 @@
     "clean:lib": "rimraf lib",
     "clean:nbextension": "rimraf ../../threeplot/nbextension/static/index.js",
     "clean": "npm run clean:lib && npm run clean:nbextension",
-    "build:nbextension": "webpack",
+    "build:nbextension": "webpack -d",
     "build:lib": "tsc --project src",
     "build": "npm run build:lib && npm run build:nbextension",
     "test": "npm run test:firefox",
@@ -16,7 +16,7 @@
     "test:debug": "karma start --browsers=Chrome --singleRun=false --debug=true tests/karma.conf.js",
     "test:firefox": "karma start --browsers=Firefox tests/karma.conf.js",
     "test:ie": "karma start --browsers=IE tests/karma.conf.js",
-    "prepublish": "npm run clean && npm run build",
+    "prepublishOnly": "npm run clean && npm run build",
     "watch": "webpack --watch"
   },
   "keywords": [
@@ -48,7 +48,8 @@
     "ts-loader": "^4.5.0",
     "typescript": "~3.0.0",
     "webpack": "^4.17.1",
-    "webpack-cli": "^3.1.0"
+    "webpack-cli": "^3.1.0",
+    "webpack-glsl-loader": "^1.0.1"
   },
   "repository": {
     "type": "git",

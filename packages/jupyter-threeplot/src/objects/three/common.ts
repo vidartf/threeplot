@@ -22,13 +22,12 @@ const N_MINOR_TICKS = 10;
 /**
  * Get a value that is small compared to the domain of a scale.
  *
- * @template TDomain
- * @param {ScaleContinuousNumeric<number, TDomain>} scale
+ * @param {ScaleContinuousNumeric<number, number>} scale
  * @param {number} [relativePrecision=1e-7]
  * @returns {number}
  */
 export
-function getScaleDomainEpsilon<TDomain>(scale: ScaleContinuousNumeric<number, TDomain>,
+function getScaleDomainEpsilon(scale: ScaleContinuousNumeric<number, number>,
                                         relativeSize=1e-7):
                                         number {
   let domain = scale.domain();
@@ -53,7 +52,7 @@ export
 interface IBounds { offset: THREE.Vector3, size: THREE.Vector3 };
 
 export
-function getGridTripletBounds<TDomain>(scales: ScaleContinuousNumeric<number, TDomain>[]): IBounds {
+function getGridTripletBounds(scales: ScaleContinuousNumeric<number, number>[]): IBounds {
   let mins = scales.map(scale => {
     return Math.min(...scale.range());
   });
@@ -149,7 +148,7 @@ function createLabel(text: string, style: IHasLabelStyle): THREE.Sprite {
  * will be applied to geometry doublet 0.
  */
 export
-function gridFromGeometries<TDomain>(geometries: MinorMajorDoublet<THREE.BufferGeometry>[],
+function gridFromGeometries(geometries: MinorMajorDoublet<THREE.BufferGeometry>[],
                                      style: IGridStyle,
                                      parentMaterial: THREE.LineBasicMaterial): THREE.Object3D {
 
